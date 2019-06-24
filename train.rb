@@ -41,10 +41,18 @@ class Train
   end
 
   def move_forward
-    next_station ? @current_station = next_station : nil
+    if next_station
+      @current_station.send_train(self)
+      next_station.get_train(self)
+      @current_station = next_station
+    end
   end
 
   def move_back
-    previous_station ? @current_station = previous_station : nil
+    if previous_station
+      @current_station.send_train(self)
+      previous_station.get_train(self)
+      @current_station = previous_station
+    end
   end
 end
