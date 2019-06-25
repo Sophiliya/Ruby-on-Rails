@@ -41,18 +41,20 @@ class Train
   end
 
   def move_forward
-    if next_station
-      @current_station.send_train(self)
-      next_station.get_train(self)
-      @current_station = next_station
-    end
+    return unless next_station
+    move_to(next_station)
   end
 
   def move_back
-    if previous_station
-      @current_station.send_train(self)
-      previous_station.get_train(self)
-      @current_station = previous_station
-    end
+    return unless previous_station
+    move_to(previous_station)
+  end
+
+  private
+
+  def move_to(target_station)
+    @current_station.send_train(self)
+    target_station.get_train(self)
+    @current_station = target_station
   end
 end
