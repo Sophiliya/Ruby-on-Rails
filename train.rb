@@ -5,7 +5,7 @@ class Train
     @number = number
     @wagons = []
     @speed = 0
-    @type = :general 
+    @type
   end
 
   def increase_speed
@@ -17,7 +17,7 @@ class Train
   end
 
   def hook(wagon)
-    @wagons << wagon if @speed.zero?
+    @wagons << wagon if wagon_attachable?(wagon)
   end
 
   def unhook(wagon)
@@ -60,5 +60,9 @@ class Train
     @current_station.send_train(self)
     target_station.get_train(self)
     @current_station = target_station
+  end
+
+  def wagon_attachable?(wagon)
+    wagon.type == self.type && @speed.zero?
   end
 end
