@@ -1,2 +1,7 @@
 class Wagon
-end 
+  attr_reader :type
+
+  def initialize
+    @type = :general 
+  end
+end

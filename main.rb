@@ -81,12 +81,12 @@ class RailRoad
 
   def create_train
     puts "Выберите тип поезда: 1. Пассажирский  2. Грузовой"
-    type = gets.chomp.strip.to_i
+    type_index = gets.chomp.strip.to_i
 
     puts "Введите номер поезда:"
     number = gets.chomp.strip
 
-    create_train!(type, number)
+    create_train!(type_index, number)
   end
 
   def create_route
@@ -117,7 +117,7 @@ class RailRoad
     route = get_route
     station = get_station(route.stations) if route
 
-    if route && station
+    if station
       route.delete_station(station)
       puts "Станция удалена."
     else
@@ -139,9 +139,9 @@ class RailRoad
 
   def attach_wagon
     train = get_train
-    wagon = get_wagon(train.class) if train
+    wagon = get_wagon(train.type) if train
 
-    if train && wagon
+    if wagon
       train.hook(wagon)
       @wagons.delete(wagon)
       puts "Вагон добавлен."
@@ -184,8 +184,8 @@ class RailRoad
 
   private
 
-  def create_train!(type, number)
-    case type
+  def create_train!(type_index, number)
+    case type_index
     when 1
       @trains << PassengerTrain.new(number)
     when 2
@@ -222,16 +222,15 @@ class RailRoad
     index == 0 ? nil : @trains[index - 1]
   end
 
-  def get_wagon(train_class)
-    type = train_class.to_s.start_with?('Cargo') ? 'CargoWagon' : 'PassengerWagon'
-    wagons = @wagons.select { |wagon| wagon.class.to_s == type }
+  def get_wagon(train_type)
+    wagons = @wagons.select { |wagon| wagon.type == train_type }
     wagons.empty? ? nil : wagons.first
   end
 
   def get_direction(train)
     puts "Выберите направление:"
-    puts "1. вперед: #{train.next_station}" if train.next_station
-    puts "2. назад: #{train.previous_station}" if train.previous_station
+    puts "1. вперед: #{train.next_station.name}" if train.next_station
+    puts "2. назад: #{train.previous_station.name}" if train.previous_station
     index = gets.chomp.strip.to_i
 
     case index

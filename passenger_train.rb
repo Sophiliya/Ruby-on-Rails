@@ -1,4 +1,9 @@
 class PassengerTrain < Train
+  def initialize(number)
+    super
+    @type = :passenger
+  end
+
   def hook(wagon)
     super if wagon_attachable?(wagon)
   end
