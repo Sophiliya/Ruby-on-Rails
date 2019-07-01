@@ -1,8 +1,7 @@
 require_relative 'instance_counter'
 
 class Route
-  extend InstanceCounter::ClassMethods
-  include InstanceCounter::InstanceMethods
+  include InstanceCounter
 
   attr_reader :stations, :start, :finish
 

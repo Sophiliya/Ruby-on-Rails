@@ -1,4 +1,11 @@
 module InstanceCounter
+  class << self
+    def included(base)
+      base.extend ClassMethods
+      base.include InstanceMethods
+    end
+  end
+
   module ClassMethods
     attr_accessor :instances
   end

@@ -2,8 +2,7 @@ require_relative 'manufacturer_company'
 require_relative 'instance_counter'
 
 class Train
-  extend InstanceCounter::ClassMethods
-  include InstanceCounter::InstanceMethods
+  include InstanceCounter
   include ManufacturerCompany
 
   attr_reader :number, :wagons, :speed, :route, :current_station, :type
