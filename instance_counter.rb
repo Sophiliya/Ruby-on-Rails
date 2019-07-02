@@ -7,7 +7,11 @@ module InstanceCounter
   end
 
   module ClassMethods
-    attr_accessor :instances
+    attr_writer :instances
+
+    def instances
+      @instances || 0
+    end
   end
 
   module InstanceMethods
