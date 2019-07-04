@@ -9,6 +9,7 @@ class Route
     @start = start
     @finish = finish
     @stations = [@start, @finish]
+    valid?
     register_instance
   end
 
@@ -22,5 +23,20 @@ class Route
 
   def name
     "#{start.name} - #{finish.name}"
+  end
+
+  private
+
+  def valid?
+    validate!
+    true
+  end
+
+  def validate!
+    if start.class.to_s == 'Station' && start.class.to_s == 'Station'
+      return
+    else
+      raise "Типы переменных не соответствуют классу Station"
+    end 
   end
 end

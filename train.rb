@@ -7,6 +7,8 @@ class Train
 
   attr_reader :number, :wagons, :speed, :route, :current_station, :type
 
+  NUMBER_FORMAT = /^[0-9a-z]{3}-?[0-9a-z]{2}$/i
+
   @@trains = {}
 
   def self.find(train_number)
@@ -15,6 +17,7 @@ class Train
 
   def initialize(number)
     @number = number
+    valid?
     @wagons = []
     @speed = 0
     @@trains[number] = self
@@ -67,8 +70,19 @@ class Train
 
   protected
 
-  # это вспомогательный метод, который не должен вызываться напрямую юзером
-  # но может вызываться у наследованных классов
+  def valid?
+    validate!
+    true
+  end
+
+  def validate!
+    if number.empty? || number.nil?
+      raise "Номер не может быть пустым"
+    elsif number !~ NUMBER_FORMAT
+      raise "Номер не соответствует формату"
+    end
+  end
+
   def move_to(target_station)
     @current_station.send_train(self)
     target_station.get_train(self)

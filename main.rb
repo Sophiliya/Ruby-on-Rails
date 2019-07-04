@@ -31,12 +31,12 @@ class RailRoad
   end
 
   def seed
-    4.times { |i| @stations << Station.new("RailRoad Station #{i}") }
+    4.times { |i| @stations << Station.new("Station #{i}") }
     10.times { @wagons << PassengerWagon.new }
     10.times { @wagons << CargoWagon.new }
 
-    @trains << PassengerTrain.new('RailRoad PT-1')
-    @trains << CargoTrain.new('RailRoad CT-1')
+    @trains << PassengerTrain.new('PTR-11')
+    @trains << CargoTrain.new('CTR-12')
 
     @routes << Route.new(@stations.first, @stations.last)
   end
@@ -75,8 +75,7 @@ class RailRoad
   def create_station
     puts "Введите название станции:"
     name = gets.chomp.strip
-    @stations << Station.new(name)
-    puts "Станция #{name} создана."
+    create_station!(name)
   end
 
   def create_train
@@ -92,13 +91,7 @@ class RailRoad
   def create_route
     stations = []
     2.times { stations << get_station }
-
-    if stations.compact.count == 2
-      @routes << Route.new(stations[0], stations[1])
-      puts "Маршрут создан."
-    else
-      puts "Произошла ошибка."
-    end
+    create_route!(stations)
   end
 
   def add_station
@@ -184,17 +177,36 @@ class RailRoad
 
   private
 
+  def create_station!(name)
+    @stations << Station.new(name)
+    puts "Станция #{name} создана."
+  rescue => message
+    puts message
+    create_station
+  end
+
   def create_train!(type_index, number)
-    case type_index
-    when 1
-      @trains << PassengerTrain.new(number)
-    when 2
-      @trains << CargoTrain.new(number)
+    if [1, 2].includes?(type_index)
+      @trains << type_index == 1 ? PassengerTrain.new(number) : CargoTrain.new(number)
     else
-      return puts "Произошла ошибка."
+      puts "Выбран неверный тип."
+      create_train
     end
 
     puts "Поезд #{number} создан."
+
+  rescue => message
+    puts message
+    create_train
+  end
+
+  def create_route!(stations)
+    @routes << Route.new(stations[0], stations[1])
+    puts "Маршрут создан."
+
+  rescue => message
+    puts message
+    create_route
   end
 
   def get_station(stations = @stations)

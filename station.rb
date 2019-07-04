@@ -13,6 +13,7 @@ class Station
 
   def initialize(name)
     @name = name
+    valid?
     @trains = []
     @@stations << self
     register_instance
@@ -36,5 +37,16 @@ class Station
     @trains.each.with_index(1) do |train, index|
       puts "#{index}. #{train.number} - #{train.class}"
     end
+  end
+
+  private
+
+  def valid?
+    validate!
+    true
+  end
+
+  def validate!
+    raise "Название не может быть пустым" if name.empty? || name.nil?
   end
 end
