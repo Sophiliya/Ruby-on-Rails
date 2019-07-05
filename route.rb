@@ -9,7 +9,7 @@ class Route
     @start = start
     @finish = finish
     @stations = [@start, @finish]
-    valid?
+    validate! if valid? == false 
     register_instance
   end
 
@@ -28,15 +28,12 @@ class Route
   private
 
   def valid?
-    validate!
-    true
+    if start.class.to_s == 'Station' && start.class.to_s == 'Station'
+      return false
+    end
   end
 
   def validate!
-    if start.class.to_s == 'Station' && start.class.to_s == 'Station'
-      return
-    else
-      raise "Типы переменных не соответствуют классу Station"
-    end 
+    raise "Типы переменных не соответствуют классу Station"
   end
 end

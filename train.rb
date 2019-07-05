@@ -17,7 +17,7 @@ class Train
 
   def initialize(number)
     @number = number
-    valid?
+    validate! if valid? == false 
     @wagons = []
     @speed = 0
     @@trains[number] = self
@@ -71,8 +71,7 @@ class Train
   protected
 
   def valid?
-    validate!
-    true
+    return false if number.empty? || number.nil? || number !~ NUMBER_FORMAT
   end
 
   def validate!

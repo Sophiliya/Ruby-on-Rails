@@ -13,7 +13,7 @@ class Station
 
   def initialize(name)
     @name = name
-    valid?
+    validate! if valid? == false 
     @trains = []
     @@stations << self
     register_instance
@@ -42,11 +42,10 @@ class Station
   private
 
   def valid?
-    validate!
-    true
+    return false if name.empty? || name.nil?
   end
 
   def validate!
-    raise "Название не может быть пустым" if name.empty? || name.nil?
+    raise "Название не может быть пустым"
   end
 end
