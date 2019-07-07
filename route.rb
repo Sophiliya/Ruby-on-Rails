@@ -29,15 +29,17 @@ class Route
 
   def valid?
     begin
-      return true if start.class.to_s == 'Station' && start.class.to_s == 'Station'
       validate!
-    rescue => message
+      true
+    rescue StandardError => message
       @message = message
       false
     end
   end
 
   def validate!
-    raise "Типы переменных не соответствуют классу Station"
+    if @start.class.to_s != 'Station' || @finish.class.to_s != 'Station'
+      raise "Типы переменных не соответствуют классу Station"
+    end 
   end
 end

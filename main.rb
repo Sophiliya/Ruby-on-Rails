@@ -207,10 +207,10 @@ class RailRoad
 
     if route.message.nil?
       @routes << route
-      puts "Маршрут создан."
+      puts "Маршрут #{route.name} создан."
     else
       puts route.message
-      create_route 
+      create_route
     end
   end
 

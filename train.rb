@@ -72,9 +72,9 @@ class Train
 
   def valid?
     begin
-      return true unless number.empty? || number.nil? || number !~ NUMBER_FORMAT
       validate!
-    rescue => message
+      true
+    rescue StandardError => message
       @message = message
       false
     end

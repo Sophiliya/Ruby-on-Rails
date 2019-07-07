@@ -3,7 +3,7 @@ require_relative 'instance_counter'
 class Station
   include InstanceCounter
 
-  attr_reader :name, :trains, :message 
+  attr_reader :name, :trains, :message
 
   @@stations = []
 
@@ -43,15 +43,17 @@ class Station
 
   def valid?
     begin
-      return true unless name.empty? || name.nil?
       validate!
-    rescue => message
+      true
+    rescue StandardError => message
       @message = message
       false
     end
   end
 
   def validate!
-    raise "Название не может быть пустым"
+    if name.nil? || name.empty?
+      raise "Название станции не может быть пустым"
+    end
   end
 end
