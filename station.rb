@@ -3,7 +3,7 @@ require_relative 'instance_counter'
 class Station
   include InstanceCounter
 
-  attr_reader :name, :trains
+  attr_reader :name, :trains, :message 
 
   @@stations = []
 
@@ -13,7 +13,7 @@ class Station
 
   def initialize(name)
     @name = name
-    validate! if valid? == false 
+    return @message unless valid?
     @trains = []
     @@stations << self
     register_instance
@@ -42,7 +42,13 @@ class Station
   private
 
   def valid?
-    return false if name.empty? || name.nil?
+    begin
+      return true unless name.empty? || name.nil?
+      validate!
+    rescue => message
+      @message = message
+      false
+    end
   end
 
   def validate!

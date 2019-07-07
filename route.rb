@@ -3,13 +3,13 @@ require_relative 'instance_counter'
 class Route
   include InstanceCounter
 
-  attr_reader :stations, :start, :finish
+  attr_reader :stations, :start, :finish, :message
 
   def initialize(start, finish)
     @start = start
     @finish = finish
     @stations = [@start, @finish]
-    validate! if valid? == false 
+    return @message unless valid?
     register_instance
   end
 
@@ -28,8 +28,12 @@ class Route
   private
 
   def valid?
-    if start.class.to_s == 'Station' && start.class.to_s == 'Station'
-      return false
+    begin
+      return true if start.class.to_s == 'Station' && start.class.to_s == 'Station'
+      validate!
+    rescue => message
+      @message = message
+      false
     end
   end
 

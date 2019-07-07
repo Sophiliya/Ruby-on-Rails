@@ -178,35 +178,40 @@ class RailRoad
   private
 
   def create_station!(name)
-    @stations << Station.new(name)
-    puts "Станция #{name} создана."
-  rescue => message
-    puts message
-    create_station
+    station = Station.new(name)
+
+    if station.message.nil?
+      @stations << station
+      puts "Станция #{name} создана."
+    else
+      puts station.message
+      create_station
+    end
   end
 
   def create_train!(type_index, number)
-    if [1, 2].includes?(type_index)
-      @trains << type_index == 1 ? PassengerTrain.new(number) : CargoTrain.new(number)
+    return puts "Выбран неверный тип." unless [1, 2].include?(type_index)
+    train = type_index == 1 ? PassengerTrain.new(number) : CargoTrain.new(number)
+
+    if train.message.nil?
+      @trains << train
+      puts "Поезд #{number} создан."
     else
-      puts "Выбран неверный тип."
+      puts train.message
       create_train
     end
-
-    puts "Поезд #{number} создан."
-
-  rescue => message
-    puts message
-    create_train
   end
 
   def create_route!(stations)
-    @routes << Route.new(stations[0], stations[1])
-    puts "Маршрут создан."
+    route = Route.new(stations[0], stations[1])
 
-  rescue => message
-    puts message
-    create_route
+    if route.message.nil?
+      @routes << route
+      puts "Маршрут создан."
+    else
+      puts route.message
+      create_route 
+    end
   end
 
   def get_station(stations = @stations)

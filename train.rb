@@ -5,7 +5,7 @@ class Train
   include InstanceCounter
   include ManufacturerCompany
 
-  attr_reader :number, :wagons, :speed, :route, :current_station, :type
+  attr_reader :number, :wagons, :speed, :route, :current_station, :type, :message
 
   NUMBER_FORMAT = /^[0-9a-z]{3}-?[0-9a-z]{2}$/i
 
@@ -17,7 +17,7 @@ class Train
 
   def initialize(number)
     @number = number
-    validate! if valid? == false 
+    return @message unless valid?
     @wagons = []
     @speed = 0
     @@trains[number] = self
@@ -71,7 +71,13 @@ class Train
   protected
 
   def valid?
-    return false if number.empty? || number.nil? || number !~ NUMBER_FORMAT
+    begin
+      return true unless number.empty? || number.nil? || number !~ NUMBER_FORMAT
+      validate!
+    rescue => message
+      @message = message
+      false
+    end
   end
 
   def validate!
