@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InstanceCounter
   class << self
     def included(base)

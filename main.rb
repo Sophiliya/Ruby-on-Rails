@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'train'
 require_relative 'passenger_train'
 require_relative 'cargo_train'
@@ -30,22 +32,6 @@ class RailRoad
     }
   end
 
-  def seed
-    4.times { |i| @stations << Station.new("Station #{i}") }
-    3.times do |i|
-      @trains << PassengerTrain.new("PTR-1#{i}")
-      @trains << CargoTrain.new("CTR-2#{i}")
-    end
-    10.times { @wagons << PassengerWagon.new(50) }
-    10.times { @wagons << CargoWagon.new(20) }
-
-    3.times { @trains[0].hook(@wagons.first) }
-    3.times { @trains.last.hook(@wagons.last) }
-
-    @routes << Route.new(@stations.first, @stations.last)
-    3.times { |i| @trains[i].assign_route(@routes.first) }
-  end
-
   def start
     loop do
       show_menu
@@ -58,36 +44,32 @@ class RailRoad
   end
 
   def show_menu
-    puts "Введите команду:"
+    puts 'Введите команду:'
     @instructions.each { |k, v| puts "#{k}. #{v}" }
   end
 
   def perform(user_command)
-    case user_command
-    when 1 then create_station
-    when 2 then create_train
-    when 3 then create_route
-    when 4 then add_station
-    when 5 then remove_station
-    when 6 then assign_route
-    when 7 then attach_wagon
-    when 8 then detach_wagon
-    when 9 then move_train
-    when 10 then show_stations_with_trains
-    end
+    tasks = {
+      1 => 'create_station', 2 => 'create_train', 3 => 'create_route',
+      4 => 'add_station', 5 => 'remove_station', 6 => 'assign_route',
+      7 => 'attach_wagon', 8 => 'detach_wagon', 9 => 'move_train',
+      10 => 'stations_trains_info'
+    }
+
+    send(tasks[user_command])
   end
 
   def create_station
-    puts "Введите название станции:"
+    puts 'Введите название станции:'
     name = gets.chomp.strip
     create_station!(name)
   end
 
   def create_train
-    puts "Выберите тип поезда: 1. Пассажирский  2. Грузовой"
+    puts 'Выберите тип поезда: 1. Пассажирский  2. Грузовой'
     type_index = gets.chomp.strip.to_i
 
-    puts "Введите номер поезда:"
+    puts 'Введите номер поезда:'
     number = gets.chomp.strip
 
     create_train!(type_index, number)
@@ -105,9 +87,9 @@ class RailRoad
 
     if route && station
       route.add_station(station)
-      puts "Станция добавлена."
+      puts 'Станция добавлена.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
@@ -117,9 +99,9 @@ class RailRoad
 
     if station
       route.delete_station(station)
-      puts "Станция удалена."
+      puts 'Станция удалена.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
@@ -129,35 +111,35 @@ class RailRoad
 
     if train && route
       train.assign_route(route)
-      puts "Маршрут назначен."
+      puts 'Маршрут назначен.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
   def attach_wagon
     train = get_train
-    wagon = get_wagon(train.type) if train
+    wagon = get_wagon(train.type)
 
-    if wagon
+    if train && wagon
       train.hook(wagon)
       @wagons.delete(wagon)
-      puts "Вагон добавлен."
+      puts 'Вагон добавлен.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
   def detach_wagon
     train = get_train
-    wagon = train.wagons.last if train && train&.wagons&.count > 0
+    wagon = train.wagons.last
 
-    if wagon
+    if train && wagon
       train.unhook(wagon)
       @wagons << wagon
-      puts "Вагон отцеплен от поезда."
+      puts 'Вагон отцеплен от поезда.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
@@ -167,30 +149,20 @@ class RailRoad
 
     if direction
       train.send(direction)
-      puts "Поезд перемещен."
+      puts 'Поезд перемещен.'
     else
-      puts "Произошла ошибка."
+      puts 'Произошла ошибка.'
     end
   end
 
-  def show_stations_with_trains
-    train_info = -> (train) { puts " - #{train.number}, #{train.class}, #{train.wagons.count}" }
-    wagon_info = -> (wagon, index) do
-      available = wagon.type == :cargo ? wagon.volume_available : wagon.seats_available
-      occupied = wagon.type == :cargo ? wagon.volume_occupied : wagon.seats_occupied
-      puts "  - #{index}, #{wagon.type}, #{available}, #{occupied}"
-    end
-    
+  def stations_trains_info
     @stations.each do |station|
       puts "#{station.name}:"
 
       station.each_train do |train|
-        train_info.call(train)
+        get_info[:train].call(train)
 
-        i = 1
-        while i <= train.wagons.count do
-          train.each_wagon { |wagon| wagon_info.call(wagon, i); i += 1 }
-        end
+        train_wagons_info(train)
       end
     end
   end
@@ -209,9 +181,10 @@ class RailRoad
     end
   end
 
-  def create_train!(type_index, number)
-    return puts "Выбран неверный тип." unless [1, 2].include?(type_index)
-    train = type_index == 1 ? PassengerTrain.new(number) : CargoTrain.new(number)
+  def create_train!(type_id, number)
+    return puts 'Выбран неверный тип.' unless [1, 2].include?(type_id)
+
+    train = type_id == 1 ? PassengerTrain.new(number) : CargoTrain.new(number)
 
     if train.message.nil?
       @trains << train
@@ -235,28 +208,29 @@ class RailRoad
   end
 
   def get_station(stations = @stations)
-    return nil if stations.empty?
+    return if stations.empty?
 
-    puts "Выберите станцию:"
-    stations.each.with_index(1) { |station, index| puts "#{index}. #{station.name}"}
-    index = gets.chomp.strip.to_i
+    puts 'Выберите станцию:'
+    stations.each.with_index(1) { |station, i| puts "#{i}. #{station.name}" }
+    i = gets.chomp.strip.to_i
 
-    index == 0 ? nil : stations[index - 1]
+    i.zero? ? nil : stations[i - 1]
   end
 
   def get_route
     return nil if @routes.empty?
-    puts "Выберите маршрут:"
-    @routes.each.with_index(1) { |route, index| puts "#{index}. #{route.name}"}
-    index = gets.chomp.strip.to_i
-    index == 0 ? nil : @routes[index - 1]
+
+    puts 'Выберите маршрут:'
+    @routes.each.with_index(1) { |route, index| puts "#{index}. #{route.name}" }
+    i = gets.chomp.strip.to_i
+    i.zero? ? nil : @routes[i - 1]
   end
 
   def get_train
-    puts "Выберите поезд:"
-    @trains.each.with_index(1) { |train, index| puts "#{index}. #{train.number}" }
-    index = gets.chomp.strip.to_i
-    index == 0 ? nil : @trains[index - 1]
+    puts 'Выберите поезд:'
+    @trains.each.with_index(1) { |train, i| puts "#{i}. #{train.number}" }
+    i = gets.chomp.strip.to_i
+    i.zero? ? nil : @trains[i - 1]
   end
 
   def get_wagon(train_type)
@@ -265,22 +239,52 @@ class RailRoad
   end
 
   def get_direction(train)
-    puts "Выберите направление:"
+    puts 'Выберите направление:'
     puts "1. вперед: #{train.next_station.name}" if train.next_station
     puts "2. назад: #{train.previous_station.name}" if train.previous_station
-    index = gets.chomp.strip.to_i
 
-    case index
-    when 1
-      'move_forward'
-    when 2
-      'move_back'
-    else
-      nil
+    index = gets.chomp.strip.to_i
+    return 'move_forward' if index == 1
+    return 'move_back' if index == 2
+  end
+
+  def get_info
+    train_info = ->(t) { puts " - #{t.number}, #{t.class}, #{t.wagons.count}" }
+    wagon_info = lambda do |w, i|
+      available = w.type == :cargo ? w.volume_available : w.seats_available
+      occupied = w.type == :cargo ? w.volume_occupied : w.seats_occupied
+      puts "  - #{i}, #{w.type}, #{available}, #{occupied}"
+    end
+
+    { train: train_info, wagon: wagon_info }
+  end
+
+  def train_wagons_info(train)
+    i = 1
+
+    while i <= train.wagons.count
+      train.each_wagon do |wagon|
+        get_info[:wagon].call(wagon, i)
+        i += 1
+      end
     end
   end
 end
 
 rr = RailRoad.new
-rr.seed
+
+4.times { |i| rr.stations << Station.new("Station #{i}") }
+3.times do |i|
+  rr.trains << PassengerTrain.new("PTR-1#{i}")
+  rr.trains << CargoTrain.new("CTR-2#{i}")
+end
+10.times { rr.wagons << PassengerWagon.new(50) }
+10.times { rr.wagons << CargoWagon.new(20) }
+
+3.times { rr.trains[0].hook(rr.wagons.first) }
+3.times { rr.trains.last.hook(rr.wagons.last) }
+
+rr.routes << Route.new(rr.stations.first, rr.stations.last)
+3.times { |i| rr.trains[i].assign_route(rr.routes.first) }
+
 rr.start

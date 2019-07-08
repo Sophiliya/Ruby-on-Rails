@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'instance_counter'
 
 class Station
@@ -14,6 +16,7 @@ class Station
   def initialize(name)
     @name = name
     return @message unless valid?
+
     @trains = []
     @@stations << self
     register_instance
@@ -24,7 +27,9 @@ class Station
   end
 
   def trains_by_type(type)
-    @trains.select { |train| train.type == type } unless @trains.empty?
+    return if @trains.empty?
+
+    @trains.select { |train| train.type == type }
   end
 
   def send_train(train)
@@ -32,7 +37,7 @@ class Station
   end
 
   def show_trains_list
-    return puts "На станции нет поездов." if @trains.empty?
+    return puts 'На станции нет поездов.' if @trains.empty?
 
     @trains.each.with_index(1) do |train, index|
       puts "#{index}. #{train.number} - #{train.class}"
@@ -42,26 +47,20 @@ class Station
   def each_train
     return if @trains.empty?
 
-    @trains.each do |train|
-      yield(train)
-    end
+    @trains.each { |train| yield(train) }
   end
 
   private
 
   def valid?
-    begin
-      validate!
-      true
-    rescue StandardError => message
-      @message = message
-      false
-    end
+    validate!
+    true
+  rescue StandardError => e
+    @message = e
+    false
   end
 
   def validate!
-    if name.nil? || name.empty?
-      raise "Название станции не может быть пустым"
-    end
+    raise 'Название станции не может быть пустым' if name.nil? || name.empty?
   end
 end

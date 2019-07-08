@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'manufacturer_company'
 require_relative 'instance_counter'
 
@@ -7,17 +9,18 @@ class Train
 
   attr_reader :number, :wagons, :speed, :route, :current_station, :type, :message
 
-  NUMBER_FORMAT = /^[0-9a-z]{3}-?[0-9a-z]{2}$/i
+  NUMBER_FORMAT = /^[0-9a-z]{3}-?[0-9a-z]{2}$/i.freeze
 
   @@trains = {}
 
   def self.find(train_number)
-    @@trains.find { |number, train| number == train_number }
+    @@trains.find { |train| train.number == train_number }
   end
 
   def initialize(number)
     @number = number
     return @message unless valid?
+
     @wagons = []
     @speed = 0
     @@trains[number] = self
@@ -60,39 +63,37 @@ class Train
 
   def move_forward
     return unless next_station
+
     move_to(next_station)
   end
 
   def move_back
     return unless previous_station
+
     move_to(previous_station)
   end
 
   def each_wagon
     return if @wagons.empty?
 
-    @wagons.each do |wagon|
-      yield(wagon)
-    end
+    @wagons.each { |wagon| yield(wagon) }
   end
 
   protected
 
   def valid?
-    begin
-      validate!
-      true
-    rescue StandardError => message
-      @message = message
-      false
-    end
+    validate!
+    true
+  rescue StandardError => e
+    @message = e
+    false
   end
 
   def validate!
     if number.empty? || number.nil?
-      raise "Номер не может быть пустым"
+      raise 'Номер не может быть пустым'
     elsif number !~ NUMBER_FORMAT
-      raise "Номер не соответствует формату"
+      raise 'Номер не соответствует формату'
     end
   end
 
@@ -103,6 +104,6 @@ class Train
   end
 
   def wagon_attachable?(wagon)
-    wagon.type == self.type && @speed.zero?
+    wagon.type == type && @speed.zero?
   end
 end

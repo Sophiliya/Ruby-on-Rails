@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CargoWagon < Wagon
   attr_reader :volume, :volume_available, :volume_occupied
 

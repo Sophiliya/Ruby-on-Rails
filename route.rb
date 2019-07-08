@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'instance_counter'
 
 class Route
@@ -10,6 +12,7 @@ class Route
     @finish = finish
     @stations = [@start, @finish]
     return @message unless valid?
+
     register_instance
   end
 
@@ -28,18 +31,16 @@ class Route
   private
 
   def valid?
-    begin
-      validate!
-      true
-    rescue StandardError => message
-      @message = message
-      false
-    end
+    validate!
+    true
+  rescue StandardError => e
+    @message = e
+    false
   end
 
   def validate!
     if @start.class.to_s != 'Station' || @finish.class.to_s != 'Station'
-      raise "Типы переменных не соответствуют классу Station"
-    end 
+      raise 'Типы переменных не соответствуют классу Station'
+    end
   end
 end
