@@ -19,12 +19,13 @@ class Train
 
   def initialize(number)
     @number = number
-    return @message unless valid?
-
     @wagons = []
     @speed = 0
-    @@trains[number] = self
-    register_instance
+
+    if valid?
+      @@trains[number] = self
+      register_instance
+    end
   end
 
   def increase_speed

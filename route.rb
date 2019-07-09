@@ -10,10 +10,11 @@ class Route
   def initialize(start, finish)
     @start = start
     @finish = finish
-    @stations = [@start, @finish]
-    return @message unless valid?
 
-    register_instance
+    if valid?
+      @stations = [@start, @finish]
+      register_instance
+    end
   end
 
   def add_station(station)
@@ -39,8 +40,7 @@ class Route
   end
 
   def validate!
-    if @start.class.to_s != 'Station' || @finish.class.to_s != 'Station'
-      raise 'Типы переменных не соответствуют классу Station'
-    end
+    stations = @start.class == Station && @finish.class == Station
+    raise 'Типы переменных не соответствуют классу Station' unless stations
   end
 end

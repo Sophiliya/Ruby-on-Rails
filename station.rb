@@ -15,11 +15,12 @@ class Station
 
   def initialize(name)
     @name = name
-    return @message unless valid?
 
-    @trains = []
-    @@stations << self
-    register_instance
+    if valid?
+      @trains = []
+      @@stations << self
+      register_instance
+    end
   end
 
   def get_train(train)
